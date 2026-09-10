@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { AdminSettingsForm } from "@/components/AdminSettingsForm";
 import { getCurrentAdmin } from "@/lib/admin";
 import { getSiteSettings } from "@/lib/settings";
@@ -14,6 +15,10 @@ export default async function AdminSettingsPage() {
     getCurrentAdmin(),
     getSiteSettings(),
   ]);
+
+  if (user?.role !== "owner") {
+    redirect("/admin");
+  }
 
   return (
     <div className="dash-page">

@@ -17,7 +17,7 @@ export function AdminCreateUserForm() {
   );
 
   return (
-    <form action={action} className="admin-form">
+    <form action={action} className="dash-form">
       <div className="admin-form__row">
         <label className="admin-form__field">
           <span>Display name</span>
@@ -50,14 +50,17 @@ export function AdminCreateUserForm() {
         </label>
       </div>
 
+      <div className="dash-form__actions" style={{ marginTop: "1rem" }}>
+        <button type="submit" className="button button--primary" disabled={pending}>
+          {pending ? "Creating..." : "Create user"}
+        </button>
+      </div>
+
       {state.error ? <p className="admin-form__error">{state.error}</p> : null}
       {state.success ? (
         <p className="admin-form__success">{state.success}</p>
       ) : null}
 
-      <button type="submit" className="button button--primary" disabled={pending}>
-        {pending ? "Creating..." : "Create user"}
-      </button>
     </form>
   );
 }
@@ -78,38 +81,55 @@ export function AdminUsersList({
         <p className="admin-form__success">{state.success}</p>
       ) : null}
 
-      <ul>
-        {users.map((user) => (
-          <li key={user.id}>
-            <div>
-              <strong>{user.name}</strong>
-              <span>
-                @{user.username} · {user.role}
-                {!user.active ? " · inactive" : ""}
-              </span>
-            </div>
-            {user.id === currentUserId ? (
-              <span className="admin-users-list__you">You</span>
-            ) : (
-              <form action={action}>
-                <input type="hidden" name="userId" value={user.id} />
-                <input
-                  type="hidden"
-                  name="active"
-                  value={user.active ? "false" : "true"}
-                />
-                <button
-                  type="submit"
-                  className="button button--ghost"
-                  disabled={pending}
-                >
-                  {user.active ? "Deactivate" : "Reactivate"}
-                </button>
-              </form>
-            )}
-          </li>
-        ))}
-      </ul>
+      <div className="dash-table-wrap">
+        <table className="dash-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th className="dash-table__actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.map((user) => (
+              <tr key={user.id}>
+                <td>
+                  <strong>{user.name}</strong>
+                  <div className="dash-table__sub">@{user.username}</div>
+                </td>
+                <td>{user.role}</td>
+                <td>
+                  <span className={user.active ? "dash-badge dash-badge--ok" : "dash-badge"}>
+                    {user.active ? "Active" : "Inactive"}
+                  </span>
+                </td>
+                <td className="dash-table__actions">
+                  {user.id === currentUserId ? (
+                    <span className="dash-muted" style={{ padding: "0 1rem" }}>You</span>
+                  ) : (
+                    <form action={action}>
+                      <input type="hidden" name="userId" value={user.id} />
+                      <input
+                        type="hidden"
+                        name="active"
+                        value={user.active ? "false" : "true"}
+                      />
+                      <button
+                        type="submit"
+                        className="button button--secondary button--sm"
+                        disabled={pending}
+                      >
+                        {user.active ? "Deactivate" : "Reactivate"}
+                      </button>
+                    </form>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

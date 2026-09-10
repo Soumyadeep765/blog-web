@@ -4,12 +4,18 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AdSlot } from "@/components/AdSlot";
 import { ArticleSidebar } from "@/components/ArticleSidebar";
+
 import { JsonLd } from "@/components/JsonLd";
 import { Markdown } from "@/components/Markdown";
 import { RelatedPosts } from "@/components/RelatedPosts";
 import { ShareButtons } from "@/components/ShareButtons";
 import { ViewTracker } from "@/components/ViewTracker";
 import { getAdSlotId, getAdsConfig } from "@/lib/ads";
+import {
+  authorToSlug,
+  getAuthorBySlug,
+  getAuthorInitials,
+} from "@/lib/authors";
 import {
   formatDate,
   formatViews,
@@ -71,6 +77,16 @@ export default async function BlogPostPage({ params }: PageProps) {
     getAdsConfig(),
   ]);
 
+  const authorSlug = authorToSlug(post.author);
+  const author = (await getAuthorBySlug(authorSlug)) || {
+    name: post.author,
+    slug: authorSlug,
+    role: "Author & Contributor",
+    bio: `Writer and contributor at ${seoSite.name}.`,
+    initials: getAuthorInitials(post.author),
+    postCount: 1,
+  };
+
   const url = absoluteUrl(`/blog/${post.slug}`, seoSite.url);
   const sidebarAdSlot = getAdSlotId("sidebar");
 
@@ -110,9 +126,23 @@ export default async function BlogPostPage({ params }: PageProps) {
 
         <header className="article__header">
           <h1 className="article__title">{post.title}</h1>
-          <time className="article__date" dateTime={post.date}>
-            {post.date}
-          </time>
+          <div className="article__meta-top">
+            <Link
+              href={`/blog/author/${author.slug}`}
+              className="article__author-pill"
+            >
+              <span className="article__author-avatar" aria-hidden="true">
+                {author.initials}
+              </span>
+              <span className="article__author-name">{author.name}</span>
+            </Link>
+            <span aria-hidden="true" className="article__meta-sep">·</span>
+            <time className="article__date" dateTime={post.date}>
+              {formatDate(post.date)}
+            </time>
+            <span aria-hidden="true" className="article__meta-sep">·</span>
+            <span className="article__reading-time">{post.readingTime}</span>
+          </div>
         </header>
 
         {ads.enabled ? (
@@ -189,6 +219,7 @@ export default async function BlogPostPage({ params }: PageProps) {
         url={url}
         title={post.title}
         description={post.description}
+        author={{ name: author.name, slug: author.slug }}
         viewsLabel={formatViews(post.views)}
         publishedLabel={formatDate(post.date)}
         updatedLabel={formatDate(post.updatedAt || post.date)}

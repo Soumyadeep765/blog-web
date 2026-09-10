@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { getAllAuthors } from "@/lib/authors";
 import { getCategories } from "@/lib/categories";
 import { getAllPosts } from "@/lib/posts";
 import { siteConfig } from "@/lib/site";
@@ -6,9 +7,10 @@ import { siteConfig } from "@/lib/site";
 export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [allPosts, categories] = await Promise.all([
+  const [allPosts, categories, authors] = await Promise.all([
     getAllPosts(),
     getCategories(),
+    getAllAuthors(),
   ]);
 
   const posts = allPosts.map((post) => ({
@@ -20,6 +22,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const categoryPages = categories.map((category) => ({
     url: `${siteConfig.url}/blog/category/${category.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly" as const,
+    priority: 0.7,
+  }));
+
+  const authorPages = authors.map((author) => ({
+    url: `${siteConfig.url}/blog/author/${author.slug}`,
     lastModified: new Date(),
     changeFrequency: "weekly" as const,
     priority: 0.7,
@@ -45,6 +54,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.6,
     },
     ...categoryPages,
+    ...authorPages,
     ...posts,
   ];
 }

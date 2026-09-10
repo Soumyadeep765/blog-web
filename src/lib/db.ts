@@ -41,4 +41,7 @@ export type DbPost = {
   date: string;
   created_at: string;
   updated_at: string;
+  excerpt: string | null;
+  meta_title: string | null;
+  meta_description: string | null;
 };

@@ -5,6 +5,7 @@ import { AdminPostForm } from "@/components/AdminPostForm";
 import { getCategories } from "@/lib/categories";
 import { getPostById } from "@/lib/posts";
 import { getSiteSettings } from "@/lib/settings";
+import { getAllAuthors } from "@/lib/authors";
 
 export const metadata: Metadata = {
   title: "Edit post",
@@ -18,10 +19,11 @@ type PageProps = {
 
 export default async function AdminEditPostPage({ params }: PageProps) {
   const { id } = await params;
-  const [post, categories, settings] = await Promise.all([
+  const [post, categories, settings, authors] = await Promise.all([
     getPostById(id),
     getCategories(),
     getSiteSettings(),
+    getAllAuthors(),
   ]);
 
   if (!post) {
@@ -45,6 +47,7 @@ export default async function AdminEditPostPage({ params }: PageProps) {
       <AdminPostForm
         post={post}
         categories={categories}
+        authors={authors}
         defaultAuthor={settings.default_author}
       />
     </div>

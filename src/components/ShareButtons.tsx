@@ -34,16 +34,10 @@ export function ShareButtons({
 
   const links = [
     {
-      label: "X",
+      label: "X (Twitter)",
       href: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`,
       icon: XLogo,
       tone: "x",
-    },
-    {
-      label: "LinkedIn",
-      href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
-      icon: LinkedInLogo,
-      tone: "linkedin",
     },
     {
       label: "Facebook",

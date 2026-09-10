@@ -10,6 +10,7 @@ import {
   LogOut,
   Settings,
   Users,
+  PenTool,
 } from "lucide-react";
 import { logoutAdmin } from "@/app/actions/admin";
 import { BrandLogo } from "@/components/BrandLogo";
@@ -20,13 +21,15 @@ const NAV: {
   label: string;
   icon: typeof LayoutDashboard;
   exact?: boolean;
+  ownerOnly?: boolean;
 }[] = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/admin/posts", label: "Posts", icon: FileText },
   { href: "/admin/categories", label: "Categories", icon: FolderOpen },
+  { href: "/admin/authors", label: "Authors", icon: PenTool, ownerOnly: true },
   { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
-  { href: "/admin/users", label: "Users", icon: Users },
-  { href: "/admin/settings", label: "Settings", icon: Settings },
+  { href: "/admin/users", label: "Users", icon: Users, ownerOnly: true },
+  { href: "/admin/settings", label: "Settings", icon: Settings, ownerOnly: true },
 ];
 
 export function AdminShell({
@@ -51,6 +54,9 @@ export function AdminShell({
 
         <nav className="dash-sidebar__nav" aria-label="Admin">
           {NAV.map((item) => {
+            if (item.ownerOnly && user.role !== "owner") {
+              return null;
+            }
             const Icon = item.icon;
             const active = item.exact
               ? pathname === item.href

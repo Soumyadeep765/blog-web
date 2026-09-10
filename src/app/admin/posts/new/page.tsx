@@ -3,6 +3,7 @@ import Link from "next/link";
 import { AdminPostForm } from "@/components/AdminPostForm";
 import { getCategories } from "@/lib/categories";
 import { getSiteSettings } from "@/lib/settings";
+import { getAllAuthors } from "@/lib/authors";
 
 export const metadata: Metadata = {
   title: "New post",
@@ -11,9 +12,10 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function AdminNewPostPage() {
-  const [categories, settings] = await Promise.all([
+  const [categories, settings, authors] = await Promise.all([
     getCategories(),
     getSiteSettings(),
+    getAllAuthors(),
   ]);
 
   return (
@@ -30,6 +32,7 @@ export default async function AdminNewPostPage() {
 
       <AdminPostForm
         categories={categories}
+        authors={authors}
         defaultAuthor={settings.default_author}
       />
     </div>

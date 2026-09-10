@@ -1,10 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
+import { authorToSlug } from "@/lib/slug";
 import type { Post } from "@/types/post";
 
 type PostCardProps = {
   post: Post;
-  variant?: "featured" | "card" | "row";
+  variant?: "featured" | "card" | "row" | "flat";
   priority?: boolean;
 };
 
@@ -41,6 +42,13 @@ export function PostCard({
         </h2>
         <p className="post-card__description">{post.description}</p>
         <div className="post-card__date-meta">
+          <Link
+            href={`/blog/author/${authorToSlug(post.author)}`}
+            className="post-card__author-link"
+          >
+            {post.author}
+          </Link>
+          <span className="post-card__separator" aria-hidden="true">·</span>
           <time className="post-card__date" dateTime={post.date}>
             {post.date}
           </time>

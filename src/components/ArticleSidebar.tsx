@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
@@ -14,6 +15,10 @@ type ArticleSidebarProps = {
   url: string;
   title: string;
   description?: string;
+  author?: {
+    name: string;
+    slug: string;
+  };
   viewsLabel: string;
   publishedLabel: string;
   updatedLabel: string;
@@ -29,6 +34,7 @@ export function ArticleSidebar({
   url,
   title,
   description,
+  author,
   viewsLabel,
   publishedLabel,
   updatedLabel,
@@ -54,6 +60,19 @@ export function ArticleSidebar({
       <section className="article-sidebar__info">
         <h2 className="article-sidebar__heading">Post info</h2>
         <dl className="article-sidebar__meta">
+          {author ? (
+            <div>
+              <dt>Author</dt>
+              <dd>
+                <Link
+                  href={`/blog/author/${author.slug}`}
+                  className="article-sidebar__author-link"
+                >
+                  {author.name}
+                </Link>
+              </dd>
+            </div>
+          ) : null}
           <div>
             <dt>Views</dt>
             <dd>{viewsLabel}</dd>

@@ -32,6 +32,9 @@ function mapPost(row: DbPost): Post {
     views: row.views ?? 0,
     date: toDateString(row.date) || new Date().toISOString().slice(0, 10),
     readingTime: readingTime(row.content || "").text,
+    excerpt: row.excerpt ?? undefined,
+    metaTitle: row.meta_title ?? undefined,
+    metaDescription: row.meta_description ?? undefined,
     createdAt: toDateString(row.created_at),
     updatedAt: toDateString(row.updated_at),
   };
@@ -203,11 +206,15 @@ export async function createPost(input: {
   author?: string;
   published?: boolean;
   date?: string;
+  excerpt?: string;
+  metaTitle?: string;
+  metaDescription?: string;
 }): Promise<Post> {
   const rows = await sql<DbPost[]>`
     insert into posts (
       slug, title, description, content, category, tags,
-      cover_image, cover_alt, author, published, date
+      cover_image, cover_alt, author, published, date,
+      excerpt, meta_title, meta_description
     ) values (
       ${input.slug},
       ${input.title},
@@ -219,7 +226,10 @@ export async function createPost(input: {
       ${input.coverAlt || null},
       ${input.author || "TeleBotHost Team"},
       ${input.published ?? true},
-      ${input.date || new Date().toISOString().slice(0, 10)}
+      ${input.date || new Date().toISOString().slice(0, 10)},
+      ${input.excerpt || null},
+      ${input.metaTitle || null},
+      ${input.metaDescription || null}
     )
     returning *
   `;
@@ -241,6 +251,9 @@ export async function updatePost(
     author?: string;
     published?: boolean;
     date?: string;
+    excerpt?: string;
+    metaTitle?: string;
+    metaDescription?: string;
   },
 ): Promise<Post> {
   const rows = await sql<DbPost[]>`
@@ -256,6 +269,9 @@ export async function updatePost(
       author = ${input.author || "TeleBotHost Team"},
       published = ${input.published ?? true},
       date = ${input.date || new Date().toISOString().slice(0, 10)},
+      excerpt = ${input.excerpt || null},
+      meta_title = ${input.metaTitle || null},
+      meta_description = ${input.metaDescription || null},
       updated_at = now()
     where id = ${id}
     returning *

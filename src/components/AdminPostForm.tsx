@@ -9,16 +9,20 @@ import {
 import type { Category } from "@/lib/categories";
 import type { Post } from "@/types/post";
 
+import type { Author } from "@/lib/authors";
+
 const initialState: AdminFormState = {};
 
 type AdminPostFormProps = {
   categories: Category[];
+  authors: Author[];
   post?: Post;
   defaultAuthor?: string;
 };
 
 export function AdminPostForm({
   categories,
+  authors,
   post,
   defaultAuthor = "TeleBotHost Team",
 }: AdminPostFormProps) {
@@ -90,26 +94,6 @@ export function AdminPostForm({
           </select>
         </label>
 
-        <label className="admin-form__field">
-          <span>Date</span>
-          <input
-            type="date"
-            name="date"
-            defaultValue={post?.date || today}
-          />
-        </label>
-      </div>
-
-      <label className="admin-form__field">
-        <span>Tags (comma separated)</span>
-        <input
-          type="text"
-          name="tags"
-          defaultValue={post?.tags.join(", ")}
-          placeholder="Next.js, Bots, Tips"
-        />
-      </label>
-
       <div className="admin-form__row">
         <label className="admin-form__field">
           <span>Cover image URL</span>
@@ -132,13 +116,69 @@ export function AdminPostForm({
       </div>
 
       <label className="admin-form__field">
-        <span>Author</span>
+        <span>Tags (comma separated)</span>
         <input
           type="text"
-          name="author"
-          defaultValue={post?.author || defaultAuthor}
+          name="tags"
+          defaultValue={post?.tags?.join(", ")}
+          placeholder="Next.js, Bots, Tips"
         />
       </label>
+
+      <div className="admin-form__row">
+        <label className="admin-form__field">
+          <span>Author</span>
+          <select name="author" defaultValue={post?.author || defaultAuthor}>
+            {authors.map((author) => (
+              <option key={author.slug} value={author.name}>
+                {author.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="admin-form__field">
+          <span>Date</span>
+          <input
+            type="date"
+            name="date"
+            defaultValue={post?.date || today}
+          />
+        </label>
+      </div>
+
+      <fieldset className="dash-form__fieldset" style={{ marginTop: "1rem" }}>
+        <legend>SEO & Meta</legend>
+        <label className="admin-form__field">
+          <span>Excerpt</span>
+          <textarea
+            name="excerpt"
+            rows={2}
+            defaultValue={post?.excerpt}
+            placeholder="Custom excerpt (overrides description on blog index)"
+          />
+        </label>
+        
+        <div className="admin-form__row">
+          <label className="admin-form__field">
+            <span>Meta Title</span>
+            <input
+              type="text"
+              name="metaTitle"
+              defaultValue={post?.metaTitle}
+              placeholder="Custom SEO Title"
+            />
+          </label>
+          <label className="admin-form__field">
+            <span>Meta Description</span>
+            <input
+              type="text"
+              name="metaDescription"
+              defaultValue={post?.metaDescription}
+              placeholder="Custom SEO Description"
+            />
+          </label>
+        </div>
+      </fieldset>
 
       <label className="admin-form__check">
         <input

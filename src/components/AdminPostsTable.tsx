@@ -37,6 +37,7 @@ export function AdminPostsTable({ posts }: { posts: Post[] }) {
           <thead>
             <tr>
               <th>Title</th>
+              <th>Author</th>
               <th>Status</th>
               <th>Category</th>
               <th>Views</th>
@@ -60,6 +61,7 @@ export function AdminPostsTable({ posts }: { posts: Post[] }) {
                     </Link>
                     <div className="dash-muted">/{post.slug}</div>
                   </td>
+                  <td>{post.author}</td>
                   <td>
                     <span
                       className={

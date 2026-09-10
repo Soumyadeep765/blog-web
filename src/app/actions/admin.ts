@@ -24,6 +24,8 @@ import {
   updatePost,
 } from "@/lib/posts";
 import { updateSiteSettings } from "@/lib/settings";
+import { sql } from "@/lib/db";
+import { authorToSlug } from "@/lib/slug";
 
 export type AdminFormState = {
   error?: string;
@@ -32,6 +34,10 @@ export type AdminFormState = {
 
 function requireAuthMessage(): AdminFormState {
   return { error: "You need to log in first." };
+}
+
+function requireOwnerMessage(): AdminFormState {
+  return { error: "Only owners can perform this action." };
 }
 
 function parsePostForm(formData: FormData) {
@@ -46,6 +52,10 @@ function parsePostForm(formData: FormData) {
   const date = String(formData.get("date") || "").trim();
   const slugInput = String(formData.get("slug") || "").trim();
   const published = formData.get("published") === "on";
+
+  const excerpt = String(formData.get("excerpt") || "").trim();
+  const metaTitle = String(formData.get("metaTitle") || "").trim();
+  const metaDescription = String(formData.get("metaDescription") || "").trim();
 
   const tags = tagsRaw
     .split(",")
@@ -64,6 +74,9 @@ function parsePostForm(formData: FormData) {
     date,
     slugInput,
     published,
+    excerpt,
+    metaTitle,
+    metaDescription,
   };
 }
 
@@ -115,6 +128,9 @@ export async function createAdminAccount(
   const current = await getCurrentAdmin();
   if (!current) {
     return requireAuthMessage();
+  }
+  if (current.role !== "owner") {
+    return requireOwnerMessage();
   }
 
   const username = String(formData.get("username") || "").trim();
@@ -168,6 +184,9 @@ export async function toggleAdminUser(
   if (!current) {
     return requireAuthMessage();
   }
+  if (current.role !== "owner") {
+    return requireOwnerMessage();
+  }
 
   const userId = String(formData.get("userId") || "");
   const active = String(formData.get("active") || "") === "true";
@@ -219,6 +238,9 @@ export async function createBlogPost(
       author: data.author,
       published: data.published,
       date: data.date || undefined,
+      excerpt: data.excerpt || undefined,
+      metaTitle: data.metaTitle || undefined,
+      metaDescription: data.metaDescription || undefined,
     });
   } catch (error) {
     const message =
@@ -271,6 +293,9 @@ export async function updateBlogPost(
       author: data.author,
       published: data.published,
       date: data.date || undefined,
+      excerpt: data.excerpt || undefined,
+      metaTitle: data.metaTitle || undefined,
+      metaDescription: data.metaDescription || undefined,
     });
   } catch (error) {
     const message =
@@ -473,4 +498,89 @@ export async function saveSiteSettings(
   revalidatePath("/admin/settings");
   revalidatePath("/about");
   return { success: "Settings saved." };
+}
+
+export async function saveAuthor(
+  _prev: AdminFormState,
+  formData: FormData,
+): Promise<AdminFormState> {
+  const current = await getCurrentAdmin();
+  if (!current) {
+    return requireAuthMessage();
+  }
+  if (current.role !== "owner") {
+    return requireOwnerMessage();
+  }
+
+  const name = String(formData.get("name") || "").trim();
+  const slugInput = String(formData.get("slug") || "").trim();
+  const role = String(formData.get("role") || "").trim();
+  const bio = String(formData.get("bio") || "").trim();
+  const avatar = String(formData.get("avatar") || "").trim();
+  const location = String(formData.get("location") || "").trim();
+  const twitter = String(formData.get("twitter") || "").trim();
+  const github = String(formData.get("github") || "").trim();
+  const website = String(formData.get("website") || "").trim();
+
+  const slug = slugInput || authorToSlug(name);
+  const isNew = formData.get("isNew") === "true";
+
+  if (!name || !slug) {
+    return { error: "Name and slug are required." };
+  }
+
+  try {
+    if (isNew) {
+      await sql`
+        INSERT INTO authors (name, slug, role, bio, avatar, location, twitter, github, website)
+        VALUES (${name}, ${slug}, ${role}, ${bio}, ${avatar}, ${location}, ${twitter}, ${github}, ${website})
+      `;
+    } else {
+      const originalSlug = String(formData.get("originalSlug") || "").trim();
+      await sql`
+        UPDATE authors
+        SET name = ${name}, slug = ${slug}, role = ${role}, bio = ${bio},
+            avatar = ${avatar}, location = ${location}, twitter = ${twitter},
+            github = ${github}, website = ${website}, updated_at = NOW()
+        WHERE slug = ${originalSlug || slug}
+      `;
+    }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Failed to save author.";
+    if (message.includes("authors_slug_key") || message.includes("duplicate")) {
+      return { error: "An author with that slug already exists." };
+    }
+    return { error: message };
+  }
+
+  revalidatePath("/admin/authors");
+  revalidatePath(`/blog/author/${slug}`);
+  return { success: "Author saved successfully." };
+}
+
+export async function deleteAuthor(
+  _prev: AdminFormState,
+  formData: FormData,
+): Promise<AdminFormState> {
+  const current = await getCurrentAdmin();
+  if (!current) {
+    return requireAuthMessage();
+  }
+  if (current.role !== "owner") {
+    return requireOwnerMessage();
+  }
+
+  const slug = String(formData.get("slug") || "").trim();
+  if (!slug) {
+    return { error: "Missing author slug." };
+  }
+
+  try {
+    await sql`DELETE FROM authors WHERE slug = ${slug}`;
+  } catch (error) {
+    return { error: "Failed to delete author." };
+  }
+
+  revalidatePath("/admin/authors");
+  redirect("/admin/authors");
 }

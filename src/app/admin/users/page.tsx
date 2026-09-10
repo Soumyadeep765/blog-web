@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import {
   AdminCreateUserForm,
   AdminUsersList,
@@ -13,6 +14,10 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminUsersPage() {
   const user = await getCurrentAdmin();
+  if (user?.role !== "owner") {
+    redirect("/admin");
+  }
+
   const users = await listAdminUsers();
 
   return (

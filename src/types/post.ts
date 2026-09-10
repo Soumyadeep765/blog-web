@@ -13,6 +13,9 @@ export type Post = {
   views: number;
   date: string;
   readingTime: string;
+  excerpt?: string;
+  metaTitle?: string;
+  metaDescription?: string;
   createdAt?: string;
   updatedAt?: string;
 };
