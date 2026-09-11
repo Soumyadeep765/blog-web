@@ -38,7 +38,7 @@ export const getAllAuthors = unstable_cache(
       return rows.map((row) => {
         const nameStr = String(row.name || "");
         const targetSlug = authorToSlug(nameStr);
-        const postCount = posts.filter(p => p.author.toLowerCase() === nameStr.toLowerCase() || authorToSlug(p.author) === targetSlug).length;
+        const postCount = posts.filter(p => (p.author || "").toLowerCase() === nameStr.toLowerCase() || authorToSlug(p.author || "") === targetSlug).length;
 
         return {
           name: nameStr,
