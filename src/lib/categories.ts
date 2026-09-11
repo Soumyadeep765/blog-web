@@ -1,4 +1,4 @@
-import { cache } from "react";
+import { unstable_cache } from "next/cache";
 import { sql } from "@/lib/db";
 
 export type Category = {
@@ -39,24 +39,30 @@ export const defaultCategories: Category[] = [
 /** @deprecated Prefer getCategories() for live data. */
 export const categories = defaultCategories;
 
-export const getCategories = cache(async (): Promise<Category[]> => {
-  try {
-    const rows = await sql<Category[]>`
-      select slug, name, coalesce(description, '') as description
-      from blog_categories
-      order by name asc
-    `;
-    return rows.length > 0 ? rows : defaultCategories;
-  } catch {
-    return defaultCategories;
-  }
-});
+export const getCategories = unstable_cache(
+  async (): Promise<Category[]> => {
+    try {
+      const rows = await sql<Category[]>`
+        select slug, name, coalesce(description, '') as description
+        from blog_categories
+        order by name asc
+      `;
+      return rows.length > 0 ? rows : defaultCategories;
+    } catch {
+      return defaultCategories;
+    }
+  },
+  ["categories"],
+  { tags: ["categories"] }
+);
 
-export const getCategoryBySlug = cache(
+export const getCategoryBySlug = unstable_cache(
   async (slug: string): Promise<Category | undefined> => {
     const all = await getCategories();
     return all.find((category) => category.slug === slug);
   },
+  ["category-by-slug"],
+  { tags: ["categories"] }
 );
 
 export async function createCategory(input: {

@@ -1,4 +1,4 @@
-import { cache } from "react";
+import { unstable_cache } from "next/cache";
 import { sql } from "@/lib/db";
 
 export type SocialLinks = {
@@ -66,17 +66,21 @@ function mapSettings(map: Record<string, string>): SiteSettings {
   };
 }
 
-export const getSiteSettings = cache(async (): Promise<SiteSettings> => {
-  try {
-    const rows = await sql<{ key: string; value: string }[]>`
-      select key, value from site_settings
-    `;
-    const map = Object.fromEntries(rows.map((row) => [row.key, row.value]));
-    return mapSettings(map);
-  } catch {
-    return DEFAULTS;
-  }
-});
+export const getSiteSettings = unstable_cache(
+  async (): Promise<SiteSettings> => {
+    try {
+      const rows = await sql<{ key: string; value: string }[]>`
+        select key, value from site_settings
+      `;
+      const map = Object.fromEntries(rows.map((row) => [row.key, row.value]));
+      return mapSettings(map);
+    } catch {
+      return DEFAULTS;
+    }
+  },
+  ["site-settings"],
+  { tags: ["settings"] }
+);
 
 export async function updateSiteSettings(
   input: Partial<{

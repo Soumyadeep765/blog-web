@@ -1,4 +1,5 @@
 import { cache } from "react";
+import { unstable_cache } from "next/cache";
 import readingTime from "reading-time";
 import { getCategoryBySlug } from "@/lib/categories";
 import { sql, type DbPost } from "@/lib/db";
@@ -40,25 +41,33 @@ function mapPost(row: DbPost): Post {
   };
 }
 
-export const getAllPosts = cache(async (): Promise<Post[]> => {
-  const rows = await sql<DbPost[]>`
-    select *
-    from posts
-    where published = true
-    order by date desc, created_at desc
-  `;
-  return rows.map(mapPost);
-});
+export const getAllPosts = unstable_cache(
+  async (): Promise<Post[]> => {
+    const rows = await sql<DbPost[]>`
+      select *
+      from posts
+      where published = true
+      order by date desc, created_at desc
+    `;
+    return rows.map(mapPost);
+  },
+  ["all-posts"],
+  { tags: ["posts"] }
+);
 
-export const getPostBySlug = cache(async (slug: string): Promise<Post | null> => {
-  const rows = await sql<DbPost[]>`
-    select *
-    from posts
-    where slug = ${slug} and published = true
-    limit 1
-  `;
-  return rows[0] ? mapPost(rows[0]) : null;
-});
+export const getPostBySlug = unstable_cache(
+  async (slug: string): Promise<Post | null> => {
+    const rows = await sql<DbPost[]>`
+      select *
+      from posts
+      where slug = ${slug} and published = true
+      limit 1
+    `;
+    return rows[0] ? mapPost(rows[0]) : null;
+  },
+  ["post-by-slug"],
+  { tags: ["posts"] }
+);
 
 export async function getPostsByCategory(categorySlug: string): Promise<Post[]> {
   const rows = await sql<DbPost[]>`
