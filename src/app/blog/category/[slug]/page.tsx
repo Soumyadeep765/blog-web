@@ -20,10 +20,8 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const [category, site] = await Promise.all([
-    getCategoryBySlug(slug),
-    getSeoSite(),
-  ]);
+  const category = await getCategoryBySlug(slug);
+  const site = await getSeoSite();
 
   if (!category) {
     return {};
@@ -39,21 +37,17 @@ export async function generateMetadata({
 }
 
 export default async function CategoryPage({ params, searchParams }: PageProps) {
-  const [{ slug }, { q }, categories] = await Promise.all([
-    params,
-    searchParams,
-    getCategories(),
-  ]);
+  const { slug } = await params;
+  const { q } = await searchParams;
+  const categories = await getCategories();
   const category = categories.find((item) => item.slug === slug);
 
   if (!category) {
     notFound();
   }
 
-  const [posts, seoSite] = await Promise.all([
-    getPostsByCategory(category.slug),
-    getSeoSite(),
-  ]);
+  const posts = await getPostsByCategory(category.slug);
+  const seoSite = await getSeoSite();
 
   return (
     <>

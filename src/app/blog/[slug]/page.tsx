@@ -39,7 +39,8 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const [post, site] = await Promise.all([getPostBySlug(slug), getSeoSite()]);
+  const post = await getPostBySlug(slug);
+  const site = await getSeoSite();
 
   if (!post) {
     return {};
@@ -69,12 +70,10 @@ export default async function BlogPostPage({ params }: PageProps) {
     notFound();
   }
 
-  const [seoSite, categoryLabel, related, ads] = await Promise.all([
-    getSeoSite(),
-    getCategoryLabel(post.category),
-    getRelatedPosts(post.slug, post.category, 3),
-    getAdsConfig(),
-  ]);
+  const seoSite = await getSeoSite();
+  const categoryLabel = await getCategoryLabel(post.category);
+  const related = await getRelatedPosts(post.slug, post.category, 3);
+  const ads = await getAdsConfig();
 
   const authorSlug = authorToSlug(post.author);
   const author = (await getAuthorBySlug(authorSlug)) || {

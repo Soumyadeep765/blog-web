@@ -28,29 +28,34 @@ export const getAllAuthors = unstable_cache(
     try {
       const rows = await sql<Record<string, unknown>[]>`
         SELECT 
-          a.name, a.slug, a.role, a.bio, a.avatar, a.location, a.twitter, a.github, a.website,
-          COUNT(p.id)::int as "postCount"
+          a.name, a.slug, a.role, a.bio, a.avatar, a.location, a.twitter, a.github, a.website
         FROM authors a
-        LEFT JOIN posts p ON (lower(p.author) = lower(a.name) OR lower(p.author) = lower(a.slug)) AND p.published = true
-        GROUP BY a.id
-        ORDER BY "postCount" DESC, a.name ASC
+        ORDER BY a.name ASC
       `;
 
-      return rows.map((row) => ({
-      name: String(row.name || ""),
-      slug: String(row.slug || ""),
-      role: String(row.role || "Author & Contributor"),
-      bio: String(row.bio || `Writer and contributor at ${siteConfig.name}.`),
-      avatar: row.avatar ? String(row.avatar) : undefined,
-      initials: getAuthorInitials(String(row.name || "")),
-      postCount: Number(row.postCount || 0),
+      const posts = await getAllPosts();
+
+      return rows.map((row) => {
+        const nameStr = String(row.name || "");
+        const targetSlug = authorToSlug(nameStr);
+        const postCount = posts.filter(p => p.author.toLowerCase() === nameStr.toLowerCase() || authorToSlug(p.author) === targetSlug).length;
+
+        return {
+          name: nameStr,
+          slug: String(row.slug || ""),
+          role: String(row.role || "Author & Contributor"),
+          bio: String(row.bio || `Writer and contributor at ${siteConfig.name}.`),
+          avatar: row.avatar ? String(row.avatar) : undefined,
+          initials: getAuthorInitials(nameStr),
+          postCount: postCount,
       location: row.location ? String(row.location) : undefined,
         socials: {
           twitter: row.twitter ? String(row.twitter) : undefined,
           github: row.github ? String(row.github) : undefined,
           website: row.website ? String(row.website) : undefined,
         }
-      }));
+      };
+    });
     } catch (error) {
       console.error("Failed to fetch authors:", error);
       return [];
@@ -66,26 +71,29 @@ export const getAuthorBySlug = unstable_cache(
     try {
       const rows = await sql<Record<string, unknown>[]>`
         SELECT 
-          a.name, a.slug, a.role, a.bio, a.avatar, a.location, a.twitter, a.github, a.website,
-          COUNT(p.id)::int as "postCount"
+          a.name, a.slug, a.role, a.bio, a.avatar, a.location, a.twitter, a.github, a.website
         FROM authors a
-        LEFT JOIN posts p ON (lower(p.author) = lower(a.name) OR lower(p.author) = lower(a.slug)) AND p.published = true
         WHERE lower(a.slug) = ${normalizedSlug}
-        GROUP BY a.id
         LIMIT 1
       `;
+
+      const posts = await getAllPosts();
 
       if (rows.length === 0) return null;
       const row = rows[0];
 
+      const nameStr = String(row.name || "");
+      const targetSlug = authorToSlug(nameStr);
+      const postCount = posts.filter(p => p.author.toLowerCase() === nameStr.toLowerCase() || authorToSlug(p.author) === targetSlug).length;
+
       return {
-      name: String(row.name || ""),
+      name: nameStr,
       slug: String(row.slug || ""),
       role: String(row.role || "Author & Contributor"),
       bio: String(row.bio || `Writer and contributor at ${siteConfig.name}.`),
       avatar: row.avatar ? String(row.avatar) : undefined,
-      initials: getAuthorInitials(String(row.name || "")),
-      postCount: Number(row.postCount || 0),
+      initials: getAuthorInitials(nameStr),
+      postCount: postCount,
       location: row.location ? String(row.location) : undefined,
         socials: {
           twitter: row.twitter ? String(row.twitter) : undefined,
