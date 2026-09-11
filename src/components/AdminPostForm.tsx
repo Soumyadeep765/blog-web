@@ -93,6 +93,7 @@ export function AdminPostForm({
             ))}
           </select>
         </label>
+      </div>
 
       <div className="admin-form__row">
         <label className="admin-form__field">
