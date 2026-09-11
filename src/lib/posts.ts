@@ -1,4 +1,5 @@
 import { unstable_cache } from "next/cache";
+import { cache } from "react";
 import readingTime from "reading-time";
 import { getCategoryBySlug } from "@/lib/categories";
 import { sql, type DbPost } from "@/lib/db";
@@ -40,7 +41,7 @@ function mapPost(row: DbPost): Post {
   };
 }
 
-export const getAllPosts = unstable_cache(
+export const getAllPosts = cache(unstable_cache(
   async (): Promise<Post[]> => {
     const rows = await sql<DbPost[]>`
       select *
@@ -52,9 +53,9 @@ export const getAllPosts = unstable_cache(
   },
   ["all-posts"],
   { tags: ["posts"] }
-);
+));
 
-export const getPostBySlug = unstable_cache(
+export const getPostBySlug = cache(unstable_cache(
   async (slug: string): Promise<Post | null> => {
     const rows = await sql<DbPost[]>`
       select *
@@ -66,7 +67,7 @@ export const getPostBySlug = unstable_cache(
   },
   ["post-by-slug"],
   { tags: ["posts"] }
-);
+));
 
 export async function getPostsByCategory(categorySlug: string): Promise<Post[]> {
   const rows = await sql<DbPost[]>`
