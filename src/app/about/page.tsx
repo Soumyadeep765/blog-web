@@ -5,6 +5,8 @@ import { getCategories } from "@/lib/categories";
 import { buildPageMetadata, getSeoSite } from "@/lib/seo";
 import { getResolvedSiteConfig } from "@/lib/site-resolved";
 
+export const dynamic = 'force-dynamic';
+
 export async function generateMetadata(): Promise<Metadata> {
   const site = await getSeoSite();
   return buildPageMetadata({

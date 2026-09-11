@@ -5,6 +5,8 @@ import { AdminLoginForm } from "@/components/AdminLoginForm";
 import { getCurrentAdmin } from "@/lib/admin";
 import { siteConfig } from "@/lib/site";
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: "Admin login",
   robots: { index: false, follow: false },
