@@ -6,8 +6,6 @@ import { getAllPosts } from "@/lib/posts";
 import { buildCollectionJsonLd, buildPageMetadata, getSeoSite } from "@/lib/seo";
 import { getResolvedSiteConfig } from "@/lib/site-resolved";
 
-export const dynamic = 'force-dynamic';
-
 export async function generateMetadata(): Promise<Metadata> {
   const site = await getSeoSite();
   return buildPageMetadata({

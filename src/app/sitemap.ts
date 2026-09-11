@@ -7,11 +7,9 @@ import { siteConfig } from "@/lib/site";
 export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [allPosts, categories, authors] = await Promise.all([
-    getAllPosts(),
-    getCategories(),
-    getAllAuthors(),
-  ]);
+  const allPosts = await getAllPosts();
+  const categories = await getCategories();
+  const authors = await getAllAuthors();
 
   const posts = allPosts.map((post) => ({
     url: `${siteConfig.url}/blog/${post.slug}`,
