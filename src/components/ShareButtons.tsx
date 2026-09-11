@@ -5,7 +5,6 @@ import { useState } from "react";
 import {
   FacebookLogo,
   LinkLogo,
-  LinkedInLogo,
   TelegramLogo,
   WhatsAppLogo,
   XLogo,

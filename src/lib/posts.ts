@@ -1,4 +1,3 @@
-import { cache } from "react";
 import { unstable_cache } from "next/cache";
 import readingTime from "reading-time";
 import { getCategoryBySlug } from "@/lib/categories";

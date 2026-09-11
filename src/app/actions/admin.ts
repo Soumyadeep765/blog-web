@@ -577,7 +577,7 @@ export async function deleteAuthor(
 
   try {
     await sql`DELETE FROM authors WHERE slug = ${slug}`;
-  } catch (error) {
+  } catch {
     return { error: "Failed to delete author." };
   }
 

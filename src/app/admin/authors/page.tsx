@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { PenTool, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { getAllAuthors } from "@/lib/authors";
 import { getCurrentAdmin } from "@/lib/admin";
 import { redirect } from "next/navigation";

@@ -21,9 +21,8 @@ export const sql =
     prepare: false,
   });
 
-if (process.env.NODE_ENV !== "production") {
-  globalForDb.sql = sql;
-}
+// Next.js clears module cache during build, so we must always cache the connection globally
+globalForDb.sql = sql;
 
 export type DbPost = {
   id: string;

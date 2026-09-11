@@ -21,7 +21,7 @@ type HastNode = {
     type: string;
     tagName?: string;
     value?: string;
-    properties?: Record<string, any>;
+    properties?: Record<string, unknown>;
     children?: Array<{
       type: string;
       value?: string;
@@ -89,7 +89,7 @@ function isLinkOnlyParagraph(node?: HastNode) {
   return (
     meaningful.length === 1 &&
     meaningful[0]?.type === "element" &&
-    (meaningful[0] as any).tagName === "a"
+    (meaningful[0] as unknown as { tagName: string }).tagName === "a"
   );
 }
 
@@ -126,8 +126,8 @@ export function Markdown({ content }: MarkdownProps) {
             }
             if (isLinkOnlyParagraph(node)) {
               const linkChild = node?.children?.find(
-                (child) => child.type === "element" && (child as any).tagName === "a"
-              ) as any;
+                (child) => child.type === "element" && (child as unknown as { tagName: string }).tagName === "a"
+              ) as unknown as { properties?: { href?: string }; children?: Array<{ value?: string }> };
               const href = linkChild?.properties?.href;
               const text = linkChild?.children?.[0]?.value || "";
               if (text === "preview" && typeof href === "string" && href.startsWith("http")) {

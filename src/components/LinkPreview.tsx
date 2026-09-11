@@ -22,6 +22,7 @@ export function LinkPreview({ href, fallbackText }: LinkPreviewProps) {
 
   useEffect(() => {
     let active = true;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
     setError(false);
 
@@ -85,6 +86,7 @@ export function LinkPreview({ href, fallbackText }: LinkPreviewProps) {
       className="link-preview-card"
     >
       <div className="link-preview-card__media">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={data.image}
           alt={data.title || "Link preview"}

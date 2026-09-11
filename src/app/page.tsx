@@ -37,12 +37,10 @@ type PageProps = {
 };
 
 export default async function HomePage({ searchParams }: PageProps) {
-  const [{ q }, posts, categories, site] = await Promise.all([
-    searchParams,
-    getAllPosts(),
-    getCategories(),
-    getResolvedSiteConfig(),
-  ]);
+  const { q } = await searchParams;
+  const posts = await getAllPosts();
+  const categories = await getCategories();
+  const site = await getResolvedSiteConfig();
 
   const seoSite = await getSeoSite();
 

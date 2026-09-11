@@ -7,7 +7,6 @@ import { GoogleAdsLoader } from "@/components/GoogleAdsLoader";
 import { Header } from "@/components/Header";
 import { ThemeScript } from "@/components/ThemeScript";
 import { buildPageMetadata, getSeoSite } from "@/lib/seo";
-import { siteConfig } from "@/lib/site";
 import "./globals.css";
 
 const jakarta = Plus_Jakarta_Sans({

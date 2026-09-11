@@ -2,7 +2,7 @@ import { unstable_cache } from "next/cache";
 import { sql } from "@/lib/db";
 import { getAllPosts } from "@/lib/posts";
 import { siteConfig } from "@/lib/site";
-import { authorToSlug, getAuthorInitials, slugify } from "@/lib/slug";
+import { authorToSlug, getAuthorInitials } from "@/lib/slug";
 import type { Post } from "@/types/post";
 
 export { authorToSlug, getAuthorInitials };
@@ -26,7 +26,7 @@ export type Author = {
 export const getAllAuthors = unstable_cache(
   async (): Promise<Author[]> => {
     try {
-      const rows = await sql<any[]>`
+      const rows = await sql<Record<string, unknown>[]>`
         SELECT 
           a.name, a.slug, a.role, a.bio, a.avatar, a.location, a.twitter, a.github, a.website,
           COUNT(p.id)::int as "postCount"
@@ -37,18 +37,18 @@ export const getAllAuthors = unstable_cache(
       `;
 
       return rows.map((row) => ({
-        name: row.name,
-        slug: row.slug,
-        role: row.role || "Author & Contributor",
-        bio: row.bio || `Writer and contributor at ${siteConfig.name}.`,
-        avatar: row.avatar || undefined,
-        initials: getAuthorInitials(row.name),
-        postCount: row.postCount || 0,
-        location: row.location || undefined,
+      name: String(row.name || ""),
+      slug: String(row.slug || ""),
+      role: String(row.role || "Author & Contributor"),
+      bio: String(row.bio || `Writer and contributor at ${siteConfig.name}.`),
+      avatar: row.avatar ? String(row.avatar) : undefined,
+      initials: getAuthorInitials(String(row.name || "")),
+      postCount: Number(row.postCount || 0),
+      location: row.location ? String(row.location) : undefined,
         socials: {
-          twitter: row.twitter || undefined,
-          github: row.github || undefined,
-          website: row.website || undefined,
+          twitter: row.twitter ? String(row.twitter) : undefined,
+          github: row.github ? String(row.github) : undefined,
+          website: row.website ? String(row.website) : undefined,
         }
       }));
     } catch (error) {
@@ -64,7 +64,7 @@ export const getAuthorBySlug = unstable_cache(
   async (slug: string): Promise<Author | null> => {
     const normalizedSlug = slug.toLowerCase().trim();
     try {
-      const rows = await sql<any[]>`
+      const rows = await sql<Record<string, unknown>[]>`
         SELECT 
           a.name, a.slug, a.role, a.bio, a.avatar, a.location, a.twitter, a.github, a.website,
           COUNT(p.id)::int as "postCount"
@@ -79,18 +79,18 @@ export const getAuthorBySlug = unstable_cache(
       const row = rows[0];
 
       return {
-        name: row.name,
-        slug: row.slug,
-        role: row.role || "Author & Contributor",
-        bio: row.bio || `Writer and contributor at ${siteConfig.name}.`,
-        avatar: row.avatar || undefined,
-        initials: getAuthorInitials(row.name),
-        postCount: row.postCount || 0,
-        location: row.location || undefined,
+      name: String(row.name || ""),
+      slug: String(row.slug || ""),
+      role: String(row.role || "Author & Contributor"),
+      bio: String(row.bio || `Writer and contributor at ${siteConfig.name}.`),
+      avatar: row.avatar ? String(row.avatar) : undefined,
+      initials: getAuthorInitials(String(row.name || "")),
+      postCount: Number(row.postCount || 0),
+      location: row.location ? String(row.location) : undefined,
         socials: {
-          twitter: row.twitter || undefined,
-          github: row.github || undefined,
-          website: row.website || undefined,
+          twitter: row.twitter ? String(row.twitter) : undefined,
+          github: row.github ? String(row.github) : undefined,
+          website: row.website ? String(row.website) : undefined,
         }
       };
     } catch (error) {

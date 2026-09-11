@@ -19,7 +19,6 @@ import {
 import {
   formatDate,
   formatViews,
-  getAllPosts,
   getCategoryLabel,
   getPostBySlug,
   getRelatedPosts,

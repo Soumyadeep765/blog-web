@@ -33,7 +33,7 @@ function parseMetaTags(html: string) {
   return { tags, title };
 }
 
-const previewCache = new Map<string, { data: any; expiry: number }>();
+const previewCache = new Map<string, { data: unknown; expiry: number }>();
 const CACHE_TTL = 3600 * 1000; // 1 hour
 
 export async function GET(request: NextRequest) {
@@ -130,7 +130,7 @@ export async function GET(request: NextRequest) {
     });
 
     return Response.json(result);
-  } catch (error: any) {
-    return Response.json({ error: error.message || "Failed to fetch metadata" }, { status: 500 });
+  } catch (error: unknown) {
+    return Response.json({ error: error instanceof Error ? error.message : "Failed to fetch metadata" }, { status: 500 });
   }
 }

@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { AuthorHero } from "@/components/AuthorHero";
 import { JsonLd } from "@/components/JsonLd";
 import { PostCard } from "@/components/PostCard";
-import { getAllAuthors, getAuthorBySlug, getPostsByAuthor } from "@/lib/authors";
+import { getAuthorBySlug, getPostsByAuthor } from "@/lib/authors";
 import {
   absoluteUrl,
   buildBreadcrumbJsonLd,
@@ -15,19 +15,14 @@ type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
-export async function generateStaticParams() {
-  const authors = await getAllAuthors();
-  return authors.map((author) => ({ slug: author.slug }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const [author, site] = await Promise.all([
-    getAuthorBySlug(slug),
-    getSeoSite(),
-  ]);
+  const author = await getAuthorBySlug(slug);
+  const site = await getSeoSite();
 
   if (!author) {
     return {};
@@ -44,10 +39,8 @@ export async function generateMetadata({
 
 export default async function AuthorPage({ params }: PageProps) {
   const { slug } = await params;
-  const [author, seoSite] = await Promise.all([
-    getAuthorBySlug(slug),
-    getSeoSite(),
-  ]);
+  const author = await getAuthorBySlug(slug);
+  const seoSite = await getSeoSite();
 
   if (!author) {
     notFound();

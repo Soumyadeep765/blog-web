@@ -22,6 +22,7 @@ export function Header() {
   const menuId = useId();
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMenuOpen(false);
     setProductsOpen(false);
   }, [pathname]);

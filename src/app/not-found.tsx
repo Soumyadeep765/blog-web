@@ -5,7 +5,7 @@ export default function NotFound() {
     <header className="page-intro">
       <h1>Page not found</h1>
       <p>
-        That link doesn't match anything here. It might be old, or it might just
+        That link doesn&apos;t match anything here. It might be old, or it might just
         be a typo.
       </p>
       <div className="hero__actions">

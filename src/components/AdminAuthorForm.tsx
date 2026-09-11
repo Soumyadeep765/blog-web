@@ -42,6 +42,7 @@ export function AdminAuthorForm({ author, isNew }: { author?: Author, isNew: boo
   // Auto-generate slug for new authors
   useEffect(() => {
     if (isNew && name) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSlug(name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, ""));
     }
   }, [name, isNew]);

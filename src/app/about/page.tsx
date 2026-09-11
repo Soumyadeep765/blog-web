@@ -17,10 +17,8 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function AboutPage() {
-  const [categories, site] = await Promise.all([
-    getCategories(),
-    getResolvedSiteConfig(),
-  ]);
+  const categories = await getCategories();
+  const site = await getResolvedSiteConfig();
 
   return (
     <>
@@ -49,7 +47,7 @@ export default async function AboutPage() {
 
       <div className="about-grid">
         <div className="about-card">
-          <h2>What you'll find</h2>
+          <h2>What you&apos;ll find</h2>
           <p>
             Longer posts with covers, categories, and tags. You can browse by
             topic, open a story, and keep reading without a pile of widgets
@@ -96,7 +94,7 @@ export default async function AboutPage() {
 
         <p>
           Want to read something? Head to the <Link href="/blog">blog</Link>, or
-          go back <Link href="/">home</Link>. If you like feeds, there's{" "}
+          go back <Link href="/">home</Link>. If you like feeds, there&apos;s{" "}
           <a href="/rss.xml">RSS</a> too.
         </p>
       </div>
