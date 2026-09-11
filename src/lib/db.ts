@@ -16,7 +16,9 @@ export const sql =
   postgres(connectionString, {
     ssl: "require",
     max: 1,
-    connect_timeout: 30,
+    idle_timeout: 1,
+    max_lifetime: 10,
+    connect_timeout: 10,
     prepare: false,
   });
 
